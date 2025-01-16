@@ -1,0 +1,49 @@
+{
+  "canisters": {
+    "internet_identity": {
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "frontend": {},
+      "remote": {
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+        }
+      },
+      "type": "custom",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
+    },
+    "mugc-sense-voice-backend": {
+      "build": "python -m kybra mugc-sense-voice-backend src/mugc-sense-voice-backend/src/main.py src/mugc-sense-voice-backend/mugc-sense-voice-backend.did",
+      "candid": "src/mugc-sense-voice-backend/mugc-sense-voice-backend.did",
+      "gzip": true,
+      "post_install": ".kybra/mugc-sense-voice-backend/post_install.sh",
+      "tech_stack": {
+        "cdk": {
+          "kybra": {}
+        },
+        "language": {
+          "python": {}
+        }
+      },
+      "type": "custom",
+      "wasm": ".kybra/mugc-sense-voice-backend/mugc-sense-voice-backend.wasm"
+    },
+    "mugc-sense-voice-frontend": {
+      "dependencies": [
+        "mugc-sense-voice-backend"
+      ],
+      "source": [
+        "src/mugc-sense-voice-frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "mugc-sense-voice-frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
