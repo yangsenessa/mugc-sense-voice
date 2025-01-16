@@ -13,3 +13,8 @@ modulegraph==0.19.3
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+
+# AI
+openai-whisper
+flask
+ffmpeg-python

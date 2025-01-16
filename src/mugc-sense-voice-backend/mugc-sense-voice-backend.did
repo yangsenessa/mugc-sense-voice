@@ -1,3 +1,4 @@
 service : {
     "greet": (text) -> (text) query;
+    "transcribe_audio": (blob, text) -> (text) query;
 }

@@ -12,7 +12,7 @@
       "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
     },
     "mugc-sense-voice-backend": {
-      "build": "python -m kybra mugc-sense-voice-backend src/mugc-sense-voice-backend/src/main.py src/mugc-sense-voice-backend/mugc-sense-voice-backend.did",
+      "build": "python -m kybra mugc-sense-voice-backend src/mugc-sense-voice-backend/src/main.py",
       "candid": "src/mugc-sense-voice-backend/mugc-sense-voice-backend.did",
       "gzip": true,
       "post_install": ".kybra/mugc-sense-voice-backend/post_install.sh",
