@@ -1,0 +1,38 @@
+{
+  "canisters": {
+    "internet_identity": {
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "frontend": {},
+      "remote": {
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+        }
+      },
+      "type": "custom",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
+    },
+    "mugc-sense-voice-backend": {
+      "candid": "src/mugc-sense-voice-backend/mugc-sense-voice-backend.did",
+      "package": "mugc-sense-voice-backend",
+      "type": "rust"
+    },
+    "mugc-sense-voice-frontend": {
+      "dependencies": [
+        "mugc-sense-voice-backend"
+      ],
+      "source": [
+        "src/mugc-sense-voice-frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "mugc-sense-voice-frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

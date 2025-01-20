@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/mugc-sense-voice-backend"
+]
+resolver = "2"
