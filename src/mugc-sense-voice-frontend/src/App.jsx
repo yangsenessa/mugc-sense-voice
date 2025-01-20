@@ -1,31 +1,53 @@
-import { useState } from 'react';
-import { mugc_sense_voice_backend } from 'declarations/mugc-sense-voice-backend';
+import React, { useState, useRef } from "react";
+import { initializeVosk, startRecognition, stopRecognition } from "./vosk";
 
-function App() {
-  const [greeting, setGreeting] = useState('');
+const App = () => {
+    const [isRecording, setIsRecording] = useState(false);
+    const [result, setResult] = useState("");
+    const recognizerSession = useRef(null);
+    const audioContextRef = useRef(null);
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    mugc_sense_voice_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
-    return false;
-  }
+    const handleStart = async () => {
+        try {
+            const model = await initializeVosk();
+            if (!audioContextRef.current) {
+                audioContextRef.current = new AudioContext();
+            }
+            recognizerSession.current = await startRecognition(audioContextRef.current, setResult);
+            setIsRecording(true);
+        } catch (error) {
+            console.error("启动语音识别失败: ", error);
+        }
+    };
 
-  return (
-    <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
-      <form action="#" onSubmit={handleSubmit}>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <section id="greeting">{greeting}</section>
-    </main>
-  );
-}
+    const handleStop = () => {
+        try {
+            if (recognizerSession.current) {
+                stopRecognition(recognizerSession.current);
+                recognizerSession.current = null;
+            }
+            if (audioContextRef.current) {
+                audioContextRef.current.close();
+                audioContextRef.current = null;
+            }
+            setIsRecording(false);
+        } catch (error) {
+            console.error("停止语音识别失败: ", error);
+        }
+    };
+
+    return (
+        <div className="app">
+            <h1>Vosk Speech Recognition</h1>
+            <button onClick={handleStart} disabled={isRecording}>
+                Start Recognition
+            </button>
+            <button onClick={handleStop} disabled={!isRecording}>
+                Stop Recognition
+            </button>
+            <pre>{result}</pre>
+        </div>
+    );
+};
 
 export default App;
