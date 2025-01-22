@@ -21,34 +21,57 @@ export async function startRecognition(audioContext, setResult) {
             throw new Error("模型尚未加载");
         }
 
-        const recognizer = await modelInstance.createRecognizer(16000); // 假设 createRecognizer 是方法
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const source = audioContext.createMediaStreamSource(stream);
-        const processor = audioContext.createScriptProcessor(4096, 1, 1);
+        // 使用 KaldiRecognizer 创建识别器
+        const recognizer = new modelInstance.KaldiRecognizer();
 
-        source.connect(processor);
-        processor.connect(audioContext.destination);
+        // 处理识别结果事件
+        recognizer.on("result", (message) => {
+            setResult((prev) => `${prev}\n${message.result.text}`);
+        });
 
-        processor.onaudioprocess = async (event) => {
-            const audioData = event.inputBuffer.getChannelData(0);
-            const result = await recognizer.acceptWaveform(audioData);
-            if (result.text) {
-                setResult((prev) => `${prev}\n${result.text}`);
+        recognizer.on("partialresult", (message) => {
+            console.log(`Partial result: ${message.result.partial}`);
+        });
+
+        // 请求用户媒体流
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: false,
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                channelCount: 1,
+                sampleRate: 16000, // 确保采样率与模型一致
+            },
+        });
+
+        // 设置音频流处理
+        const recognizerNode = audioContext.createScriptProcessor(4096, 1, 1);
+        recognizerNode.onaudioprocess = (event) => {
+            try {
+                recognizer.acceptWaveform(event.inputBuffer);
+            } catch (error) {
+                console.error("acceptWaveform failed", error);
             }
         };
 
-        return { recognizer, stream, processor };
+        // 连接音频源和处理器
+        const source = audioContext.createMediaStreamSource(mediaStream);
+        source.connect(recognizerNode);
+
+        return { recognizer, mediaStream, recognizerNode };
     } catch (error) {
         console.error("启动语音识别失败: ", error);
         throw error;
     }
 }
 
-export function stopRecognition({ stream, processor }) {
+export function stopRecognition({ mediaStream, recognizerNode }) {
     try {
-        processor.disconnect();
-        stream.getTracks().forEach((track) => track.stop());
-        console.log("语音识别已停止");
+        if (mediaStream && recognizerNode) {
+            recognizerNode.disconnect();
+            mediaStream.getTracks().forEach((track) => track.stop());
+            console.log("语音识别已停止");
+        }
     } catch (error) {
         console.error("停止语音识别失败: ", error);
     }
