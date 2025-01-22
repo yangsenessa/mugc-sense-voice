@@ -22,7 +22,7 @@ export async function startRecognition(audioContext, setResult) {
         }
 
         // 使用 KaldiRecognizer 创建识别器
-        const recognizer = new modelInstance.KaldiRecognizer();
+        const recognizer = new modelInstance.KaldiRecognizer(16000);
 
         // 处理识别结果事件
         recognizer.on("result", (message) => {
