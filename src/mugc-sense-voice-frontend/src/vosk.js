@@ -5,8 +5,9 @@ let modelInstance = null;
 export async function initializeVosk(modelUrl) {
     try {
         console.log("初始化 Vosk 模型...");
+        console.log(`模型路径: ${modelUrl}`);
         modelInstance = await createModel(modelUrl);
-        console.log(modelInstance);
+        console.log("模型实例: ", modelInstance);
         console.log("Vosk 模型加载成功");
     } catch (error) {
         console.error("初始化 Vosk 或加载模型时出错: ", error);

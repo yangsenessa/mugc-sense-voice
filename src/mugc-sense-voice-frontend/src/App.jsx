@@ -1,51 +1,32 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { initializeVosk, startRecognition, stopRecognition } from "./vosk";
 
 const App = () => {
-    const [isRecording, setIsRecording] = useState(false);
-    const [result, setResult] = useState("");
-    const recognizerSession = useRef(null);
-    const audioContextRef = useRef(null);
+    const [recognizer, setRecognizer] = useState(null);
 
     const handleStart = async () => {
         try {
-            const model = await initializeVosk();
-            if (!audioContextRef.current) {
-                audioContextRef.current = new AudioContext();
-            }
-            recognizerSession.current = await startRecognition(audioContextRef.current, setResult);
-            setIsRecording(true);
+            const model = await initializeVosk("/models/vosk-model-small-en-us-0.15.tar.gz");
+            const rec = startRecognition(model);
+            setRecognizer(rec);
+            console.log("语音识别器已启动");
         } catch (error) {
             console.error("启动语音识别失败: ", error);
         }
     };
 
     const handleStop = () => {
-        try {
-            if (recognizerSession.current) {
-                stopRecognition(recognizerSession.current);
-                recognizerSession.current = null;
-            }
-            if (audioContextRef.current) {
-                audioContextRef.current.close();
-                audioContextRef.current = null;
-            }
-            setIsRecording(false);
-        } catch (error) {
-            console.error("停止语音识别失败: ", error);
-        }
+        stopRecognition(recognizer);
+        setRecognizer(null);
     };
 
     return (
-        <div className="app">
+        <div>
             <h1>Vosk Speech Recognition</h1>
-            <button onClick={handleStart} disabled={isRecording}>
-                Start Recognition
-            </button>
-            <button onClick={handleStop} disabled={!isRecording}>
+            <button onClick={handleStart}>Start Recognition</button>
+            <button onClick={handleStop} disabled={!recognizer}>
                 Stop Recognition
             </button>
-            <pre>{result}</pre>
         </div>
     );
 };
