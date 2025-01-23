@@ -1,4 +1,4 @@
-import { createModel } from "vosk-browser";
+import {createModel} from "vosk-browser";
 
 let modelInstance = null;
 
@@ -23,14 +23,20 @@ export async function startRecognition(audioContext, setResult) {
 
         // 使用 KaldiRecognizer 创建识别器
         const recognizer = new modelInstance.KaldiRecognizer(16000);
+        console.log("Recognizer instance:", recognizer);
 
         // 处理识别结果事件
         recognizer.on("result", (message) => {
+            console.log(`Result: ${message.result.text}`);
             setResult((prev) => `${prev}\n${message.result.text}`);
         });
 
         recognizer.on("partialresult", (message) => {
             console.log(`Partial result: ${message.result.partial}`);
+        });
+
+        recognizer.on("error", (error) => {
+            console.error("Error: ", error);
         });
 
         // 请求用户媒体流
@@ -46,9 +52,15 @@ export async function startRecognition(audioContext, setResult) {
 
         // 设置音频流处理
         const recognizerNode = audioContext.createScriptProcessor(4096, 1, 1);
-        recognizerNode.onaudioprocess = (event) => {
+        recognizerNode.onaudioprocess = async (event) => {
             try {
-                recognizer.acceptWaveform(event.inputBuffer);
+                const audioData = event.inputBuffer.getChannelData(0);
+                console.log("Audio data: ", audioData);
+                const result = await recognizer.acceptWaveform(event.inputBuffer);
+                if (result) {
+                    console.log("Recognition result:", result);
+                    setResult((prev) => `{prev}\n${result}`);
+                }
             } catch (error) {
                 console.error("acceptWaveform failed", error);
             }
@@ -57,15 +69,16 @@ export async function startRecognition(audioContext, setResult) {
         // 连接音频源和处理器
         const source = audioContext.createMediaStreamSource(mediaStream);
         source.connect(recognizerNode);
+        recognizerNode.connect(audioContext.destination);
 
-        return { recognizer, mediaStream, recognizerNode };
+        return {recognizer, mediaStream, recognizerNode};
     } catch (error) {
         console.error("启动语音识别失败: ", error);
         throw error;
     }
 }
 
-export function stopRecognition({ mediaStream, recognizerNode }) {
+export function stopRecognition({mediaStream, recognizerNode}) {
     try {
         if (mediaStream && recognizerNode) {
             recognizerNode.disconnect();
