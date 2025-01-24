@@ -17,9 +17,6 @@
       "type": "rust"
     },
     "mugc-sense-voice-frontend": {
-      "headers": {
-        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-eval'; worker-src 'self' blob:;"
-      },
       "dependencies": [
         "mugc-sense-voice-backend"
       ],

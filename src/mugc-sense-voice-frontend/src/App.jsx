@@ -14,21 +14,20 @@ const App = () => {
     const initializeModel = async () => {
         try {
             await initializeVosk("/models/vosk-model-small-en-us-0.15.tar.gz");
-            console.log("Vosk 模型初始化成功！");
             setIsModelInitialized(true);
         } catch (error) {
-            console.error("模型初始化失败：", error);
+            console.error("Model initialization failed：", error);
         }
     };
 
     const handleStart = async () => {
         try {
             if (!isModelInitialized) {
-                alert("请先初始化模型");
+                alert("Please initialize the model first");
                 return;
             }
 
-            console.log("开始语音识别");
+            console.log("Start speech recognition");
             audioContextRef.current = new AudioContext();
             const { recognizer, mediaStream, recognizerNode } = await startRecognition(
                 audioContextRef.current,
@@ -41,13 +40,13 @@ const App = () => {
 
             setIsRecognizing(true);
         } catch (error) {
-            console.error("启动语音识别失败：", error);
+            console.error("Failed to start speech recognition：", error);
         }
     };
 
     const handleStop = () => {
         try {
-            console.log("停止语音识别...");
+            console.log("Stop speech recognition...");
             stopRecognition({
                 mediaStream: mediaStreamRef.current,
                 recognizerNode: recognizerNodeRef.current,
@@ -60,7 +59,7 @@ const App = () => {
 
             setIsRecognizing(false);
         } catch (error) {
-            console.error("停止语音识别失败：", error);
+            console.error("Stopping speech recognition failed：", error);
         }
     };
 

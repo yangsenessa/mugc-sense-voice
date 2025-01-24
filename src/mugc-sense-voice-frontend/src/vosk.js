@@ -4,13 +4,13 @@ let modelInstance = null;
 
 export async function initializeVosk(modelUrl) {
     try {
-        console.log("初始化 Vosk 模型...");
-        console.log(`模型路径: ${modelUrl}`);
+        console.log("Initializing Vosk Model...");
+        console.log(`Model Path: ${modelUrl}`);
         modelInstance = await createModel(modelUrl);
-        console.log("模型实例: ", modelInstance);
-        console.log("Vosk 模型加载成功");
+        console.log("Model Instance: ", modelInstance);
+        console.log("Vosk Model load successfully");
     } catch (error) {
-        console.error("初始化 Vosk 或加载模型时出错: ", error);
+        console.error("Initializing Vosk Error: ", error);
         throw error;
     }
 }
@@ -18,16 +18,12 @@ export async function initializeVosk(modelUrl) {
 export async function startRecognition(audioContext, setResult) {
     try {
         if (!modelInstance) {
-            throw new Error("模型尚未加载");
+            throw new Error("Model not loaded...");
         }
 
-
-
-        // 使用 KaldiRecognizer 创建识别器
         const recognizer = new modelInstance.KaldiRecognizer(16000);
         console.log("Recognizer instance:", recognizer);
 
-        // 处理识别结果事件
         recognizer.on("result", (message) => {
             console.log(`Result: ${message.result.text}`);
             setResult((prev) => `${prev}\n${message.result.text}`);
@@ -41,18 +37,16 @@ export async function startRecognition(audioContext, setResult) {
             console.error("Error: ", error);
         });
 
-        // 请求用户媒体流
         const mediaStream = await navigator.mediaDevices.getUserMedia({
             // video: false,
             audio: {
                 echoCancellation: true,
                 noiseSuppression: true,
                 channelCount: 1,
-                sampleRate: 16000, // 确保采样率与模型一致
+                sampleRate: 16000,
             },
         });
 
-        // 设置音频流处理
         const source = audioContext.createMediaStreamSource(mediaStream);
         const recognizerNode = audioContext.createScriptProcessor(4096, 1, 1);
 
@@ -69,10 +63,10 @@ export async function startRecognition(audioContext, setResult) {
         source.connect(recognizerNode);
         recognizerNode.connect(audioContext.destination);
 
-        console.log("语音识别已启动");
+        console.log("Speech recognition activated");
         return {recognizer, mediaStream, recognizerNode};
     } catch (error) {
-        console.error("启动语音识别失败: ", error);
+        console.error("Failed to start speech recognition: ", error);
         throw error;
     }
 }
@@ -88,8 +82,8 @@ export function stopRecognition({mediaStream, recognizerNode}) {
             mediaStream.getTracks().forEach((track) => track.stop());
         }
 
-        console.log("语音识别已停止");
+        console.log("Speech recognition stopped");
     } catch (error) {
-        console.error("停止语音识别失败: ", error);
+        console.error("Stopping speech recognition failed: ", error);
     }
 }
