@@ -6,7 +6,9 @@ export async function initializeVosk(modelUrl) {
     try {
         console.log("Initializing Vosk Model...");
         console.log(`Model Path: ${modelUrl}`);
+
         modelInstance = await createModel(modelUrl);
+
         console.log("Model Instance: ", modelInstance);
         console.log("Vosk Model load successfully");
     } catch (error) {

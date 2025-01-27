@@ -9,6 +9,7 @@ dotenv.config({ path: '../../.env' });
 
 export default defineConfig({
   build: {
+    outDir: 'dist',
     emptyOutDir: true,
   },
   optimizeDeps: {
@@ -25,6 +26,9 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    fs: {
+      allow: ['src']
+    }
   },
   plugins: [
     react(),
