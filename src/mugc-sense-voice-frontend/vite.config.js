@@ -20,6 +20,24 @@ export default defineConfig({
     },
   },
   server: {
+    server: {
+      headers: {
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Embedder-Policy': 'require-corp',
+        'Content-Security-Policy': "default-src 'self' blob: data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; connect-src 'self' *; img-src 'self' data: blob:;"
+      }
+    },
+    optimizeDeps: {
+      exclude: ['vosk-browser']
+    },
+    build: {
+      target: 'esnext',
+      rollupOptions: {
+        output: {
+          inlineDynamicImports: true
+        }
+      }
+    },
     proxy: {
       "/api": {
         target: "http://127.0.0.1:4943",
