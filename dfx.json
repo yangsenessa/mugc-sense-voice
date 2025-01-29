@@ -22,14 +22,7 @@
       ],
       "source": ["src/mugc-sense-voice-frontend/dist"],
       "type": "assets",
-      "workspace": "mugc-sense-voice-frontend",
-      "declarations": {
-        "node_modules": ["@dfinity/agent"]
-      },
-      "frontend": {
-        "entrypoint": "src/mugc-sense-voice-frontend/dist/index.html"
-      },
-      "custom_headers": "custom-headers.json"
+      "workspace": "mugc-sense-voice-frontend"
     }
   },
   "defaults": {
