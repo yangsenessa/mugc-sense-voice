@@ -2,6 +2,7 @@ use ic_cdk_macros::update;
 use candid::Nat;
 use num_traits::ToPrimitive;
 use ndarray::{Array2, Array};
+use ndarray::Axis;
 use ndarray_rand::RandomExt;
 use rand::distributions::Distribution;
 use rand::thread_rng;
@@ -64,12 +65,30 @@ impl CnnModel {
     }
 
     pub fn predict(&self, input: Vec<f32>) -> Vec<f32> {
-        let input = match Array2::from_shape_vec((input.len() / 784, 784), input) {
+        // let input = match Array2::from_shape_vec((input.len() / 784, 784), input) {
+        //     Ok(arr) => arr,
+        //     Err(_) => return vec![],
+        // };
+        //
+        // let output = input.dot(&self.weights) + &self.bias;
+        // output.into_raw_vec()
+
+        let batch_size = input.len() / 784;
+        let input = match Array2::from_shape_vec((batch_size, 784), input) {
             Ok(arr) => arr,
             Err(_) => return vec![],
         };
 
-        let output = input.dot(&self.weights) + &self.bias;
+        let mut output = input.dot(&self.weights) + &self.bias;
+        for mut row in output.axis_iter_mut(Axis(0)) {
+            let max_val = row.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
+            let exp_values: Vec<f32> = row.iter().map(|&v| (v - max_val).exp()).collect();
+            let sum_exp: f32 = exp_values.iter().sum();
+            for (i, val) in row.iter_mut().enumerate() {
+                *val = exp_values[i] / sum_exp;
+            }
+        }
+
         output.into_raw_vec()
     }
 }
